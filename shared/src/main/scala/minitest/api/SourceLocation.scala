@@ -27,7 +27,7 @@ final case class SourceLocation(
 )
 
 object SourceLocation {
-  inline implicit def fromContext: SourceLocation = ~fromContextImpl
+  inline implicit def fromContext: SourceLocation = ${ fromContextImpl }
 
   def fromContextImpl(implicit reflect: Reflection): Expr[SourceLocation] = {
     import reflect._
@@ -35,6 +35,6 @@ object SourceLocation {
     val fileName = pos.sourceFile.getFileName.toString
     val path = pos.sourceFile.getParent.toString
     val line = pos.startLine + 1
-    '(SourceLocation(Some(~fileName.toExpr), Some(~path.toExpr), ~line.toExpr))
+    '{SourceLocation(Some(${fileName.toExpr}), Some(${path.toExpr}), ${line.toExpr})}
   }
 }
