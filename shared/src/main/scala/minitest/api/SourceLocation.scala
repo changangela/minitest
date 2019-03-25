@@ -32,8 +32,8 @@ object SourceLocation {
   def fromContextImpl(implicit reflect: Reflection): Expr[SourceLocation] = {
     import reflect._
     val pos = rootPosition
-    val fileName = pos.sourceFile.getFileName.toString
-    val path = pos.sourceFile.getParent.toString
+    val fileName = pos.sourceFile.jpath.getFileName.toString
+    val path = pos.sourceFile.jpath.getParent.toString
     val line = pos.startLine + 1
     '{SourceLocation(Some(${fileName.toExpr}), Some(${path.toExpr}), ${line.toExpr})}
   }
