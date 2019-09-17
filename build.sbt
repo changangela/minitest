@@ -261,7 +261,7 @@ lazy val lawsLegacyJS  = lawsLegacy.js
 
 lazy val dottySettings = List(
   libraryDependencies := libraryDependencies.value.map(_.withDottyCompat(scalaVersion.value)),
-  scalacOptions := List()
+  scalacOptions := List("-Yexplicit-nulls")
 )
 
 lazy val `dotty-community-build` = project
