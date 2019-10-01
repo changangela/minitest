@@ -20,24 +20,25 @@ package minitest.runner
 import sbt.testing.{Runner => BaseRunner, Task => BaseTask, _}
 
 final class Runner(
-  val args: Array[String],
-  val remoteArgs: Array[String],
+  // error overiding Array[T | JavaNull] | JavaNull with Array[T]
+  val args: Array[String | Null] | Null,
+  val remoteArgs: Array[String | Null] | Null,
   val options: Options,
   classLoader: ClassLoader)
   extends BaseRunner {
 
   def done(): String = ""
 
-  def tasks(list: Array[TaskDef]): Array[BaseTask] = {
-    list.map(t => new Task(t, options, classLoader))
+  def tasks(list: Array[TaskDef | Null] | Null): Array[BaseTask | Null] = {
+    list.nn.map(t => new Task(t.nn, options, classLoader))
   }
 
   def receiveMessage(msg: String): Option[String] = {
     None
   }
 
-  def serializeTask(task: BaseTask, serializer: TaskDef => String): String =
-    serializer(task.taskDef())
+  def serializeTask(task: BaseTask, serializer: TaskDef | Null => String): String =
+    serializer(task.taskDef().nn)
 
   def deserializeTask(task: String, deserializer: String => TaskDef): BaseTask =
     new Task(deserializer(task), options, classLoader)

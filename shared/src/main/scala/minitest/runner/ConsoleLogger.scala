@@ -25,14 +25,14 @@ final class ConsoleLogger extends Logger {
 
   def ansiCodesSupported(): Boolean =
     withColors
-  def error(msg: String): Unit =
+  def error(msg: String | Null): Unit =
     print(msg)
-  def warn(msg: String): Unit =
+  def warn(msg: String | Null): Unit =
     print(msg)
-  def info(msg: String): Unit =
+  def info(msg: String | Null): Unit =
     print(msg)
-  def debug(msg: String): Unit =
+  def debug(msg: String | Null): Unit =
     print(msg)
-  def trace(t: Throwable): Unit =
-    t.printStackTrace(System.out)
+  def trace(t: Throwable | Null): Unit =
+    t.nn.printStackTrace(System.out)
 }

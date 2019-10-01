@@ -55,7 +55,7 @@ object Result {
     }
   }
 
-  final case class Failure(msg: String, source: Option[Throwable], location: Option[SourceLocation])
+  final case class Failure(msg: String | Null, source: Option[Throwable], location: Option[SourceLocation])
     extends Result[Nothing] {
 
     def formatted(name: String, withColors: Boolean): String =
@@ -69,7 +69,7 @@ object Result {
       val description = {
         val name = source.getClass.getName
         val className = name.substring(name.lastIndexOf(".") + 1)
-        Option(source.getMessage).filterNot(_.isEmpty)
+        Option(source.getMessage).filterNot(_.nn.isEmpty)
           .fold(className)(m => s"$className: $m")
       }
 
@@ -92,7 +92,7 @@ object Result {
       Result.Exception(other, None)
   }
 
-  private def formatError(name: String, msg: String,
+  private def formatError(name: String, msg: String | Null,
     source: Option[Throwable],
     location: Option[SourceLocation],
     traceLimit: Option[Int],
