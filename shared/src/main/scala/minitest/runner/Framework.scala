@@ -25,13 +25,15 @@ class Framework extends BaseFramework {
 
   def options: Options = Options()
 
-  def fingerprints(): Array[Fingerprint] =
+  // overriding method of type (): Array[sbt.testing.Fingerprint | JavaNull] | JavaNull
+  def fingerprints(): Array[Fingerprint | Null] =
     Array(ModuleFingerprint)
 
-  def runner(args: Array[String], remoteArgs: Array[String], testClassLoader: ClassLoader): Runner =
-    new minitest.runner.Runner(args, remoteArgs, options, testClassLoader)
+  def runner(args: Array[String | Null] | Null, remoteArgs: Array[String | Null] | Null, testClassLoader: ClassLoader | Null): Runner =
+    new minitest.runner.Runner(args, remoteArgs, options, testClassLoader.nn)
 
-  def slaveRunner(args: Array[String], remoteArgs: Array[String], testClassLoader: ClassLoader, send: String => Unit): Runner =
+  // overriding method of type Array[something | JavaNull] | JavaNull
+  def slaveRunner(args: Array[String | Null], remoteArgs: Array[String | Null], testClassLoader: ClassLoader, send: String => Unit): Runner =
     runner(args, remoteArgs, testClassLoader)
 }
 

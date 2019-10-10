@@ -29,7 +29,7 @@ final class Task(task: TaskDef, opts: Options, cl: ClassLoader) extends BaseTask
   implicit val ec: ExecutionContext = DefaultExecutionContext
   private[this] val console = if (opts.useSbtLogging) None else Some(Array(new ConsoleLogger))
 
-  def tags(): Array[String] = Array.empty
+  def tags(): Array[String | Null] = Array.empty
   def taskDef(): TaskDef = task
 
   def reportStart(name: String, loggers: Array[Logger]): Unit = {
@@ -47,8 +47,9 @@ final class Task(task: TaskDef, opts: Options, cl: ClassLoader) extends BaseTask
     }
   }
 
-  def execute(eventHandler: EventHandler, loggers: Array[Logger],
+  def execute(eventHandler: EventHandler, _loggers: Array[Logger | Null],
     continuation: Array[BaseTask] => Unit): Unit = {
+    val loggers = _loggers.map(x => x.nn)
 
     def loop(props: Iterator[TestSpec[Unit, Unit]]): Future[Unit] = {
       if (!props.hasNext) unit else {
@@ -66,8 +67,8 @@ final class Task(task: TaskDef, opts: Options, cl: ClassLoader) extends BaseTask
       }
     }
 
-    val future = loadSuite(task.fullyQualifiedName(), cl).fold(unit) { suite =>
-      reportStart(task.fullyQualifiedName(), loggers)
+    val future = loadSuite(task.fullyQualifiedName().nn, cl).fold(unit) { suite =>
+      reportStart(task.fullyQualifiedName().nn, loggers)
       suite.properties.setupSuite()
       loop(suite.properties.iterator).map { _ =>
         suite.properties.tearDownSuite()
@@ -77,9 +78,9 @@ final class Task(task: TaskDef, opts: Options, cl: ClassLoader) extends BaseTask
     future.onComplete(_ => continuation(Array.empty))
   }
 
-  def execute(eventHandler: EventHandler, loggers: Array[Logger]): Array[BaseTask] = {
+  def execute(eventHandler: EventHandler | Null, loggers: Array[Logger | Null] | Null): Array[BaseTask | Null] = {
     val p = Promise[Unit]()
-    execute(eventHandler, loggers, _ => p.success(()))
+    execute(eventHandler.nn, loggers.nn, _ => p.success(()))
     Await.result(p.future, Duration.Inf)
     Array.empty
   }
@@ -95,7 +96,7 @@ final class Task(task: TaskDef, opts: Options, cl: ClassLoader) extends BaseTask
 
   def event(result: Result[Unit], durationMillis: Long): Event = new Event {
     def fullyQualifiedName(): String =
-      task.fullyQualifiedName()
+      task.fullyQualifiedName().nn
 
     def throwable(): OptionalThrowable =
       result match {
@@ -122,11 +123,11 @@ final class Task(task: TaskDef, opts: Options, cl: ClassLoader) extends BaseTask
       }
 
     def selector(): Selector = {
-      task.selectors().head
+      task.selectors().nn.head.nn
     }
 
     def fingerprint(): Fingerprint =
-      task.fingerprint()
+      task.fingerprint().nn
 
     def duration(): Long =
       durationMillis
